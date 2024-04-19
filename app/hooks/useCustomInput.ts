@@ -11,6 +11,7 @@ export const useCustomInput = ({ onSendMessage }: UseCustomInputProps) => {
   const { data: session } = useSession();
   const [inputValue, setInputValue] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState({
+    rag: false,
     speech: false,
     vision: false
   });
@@ -42,6 +43,20 @@ export const useCustomInput = ({ onSendMessage }: UseCustomInputProps) => {
       setValue('isVisionDefined', true);
     } else {
       setValue('isVisionDefined', false);
+    }
+
+    // Prefetch rag data
+    response = await retrieveServices({
+      userEmail,
+      serviceName: 'rag',
+    });
+    if (response.ragId) {
+      setValue('isRagEnabled', response.isRagEnabled);
+      setValue('ragFiles', response.ragFileList);
+      setValue('topK', response.topK);
+      setValue('chunkSize', response.chunkSize);
+      setValue('chunkBatch', response.chunkBatch);
+      setValue('parsingStrategy', response.parsingStrategy);
     }
   }, [session?.user?.email, setValue]);
 

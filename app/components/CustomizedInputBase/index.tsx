@@ -3,6 +3,7 @@ import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
 import VisionIcon from '@mui/icons-material/Visibility';
+import RagIcon from '@mui/icons-material/Storage';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useCustomInput } from '@/app/hooks/useCustomInput';
@@ -12,6 +13,7 @@ import { Microphone } from '../Speech/stt';
 import MenuIcon from '@mui/icons-material/Menu';
 import SpeechDialog from '../Speech/tts';
 import VisionDialog from '../Vision';
+import RagDialog from '../Rag';
 
 const CustomizedInputBase = ({
   onSendMessage,
@@ -73,6 +75,12 @@ const CustomizedInputBase = ({
             horizontal: 'right',
           }}
         >
+          <MenuItem onClick={() => toggleDialog('rag')}>
+            <ListItemIcon>
+              <RagIcon />
+            </ListItemIcon>
+            R.A.G.
+          </MenuItem>
           <MenuItem onClick={() => toggleDialog('speech')}>
             <ListItemIcon>
               <RecordVoiceOver />
@@ -103,6 +111,11 @@ const CustomizedInputBase = ({
           </IconButton>
         </Tooltip>
       </Paper>
+
+      <RagDialog
+        open={isDialogOpen.rag}
+        onClose={() => toggleDialog('rag')}
+      />
 
       <SpeechDialog
         open={isDialogOpen.speech}
