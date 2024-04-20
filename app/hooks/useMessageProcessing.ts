@@ -7,6 +7,8 @@ import {
   retrieveAIResponse,
   retrieveTextFromSpeech
 } from '@/app/services/chatService';
+import { embedConversation } from '../services/embeddingService';
+import { queryVectorDbByNamespace } from '../services/vectorDbService';
 const nlp = winkNLP(model);
 
 export const useMessageProcessing = (session: any) => {
@@ -15,8 +17,10 @@ export const useMessageProcessing = (session: any) => {
 
   const isAssistantEnabled = watch('isAssistantEnabled');
   const isTextToSpeechEnabled = watch('isTextToSpeechEnabled');
+  const isRagEnabled = watch('isRagEnabled');
   const model = watch('model');
   const voice = watch('voice');
+  const topK = watch('topK');
   const sentences = useRef<string[]>([]);
   const sentenceIndex = useRef<number>(0);
 
@@ -178,6 +182,16 @@ export const useMessageProcessing = (session: any) => {
     FOLLOW THESE INSTRUCTIONS AT ALL TIMES:
     1. Make use of CONTEXT and HISTORY below, to briefly respond to the user prompt. 
     2. If you cannot find this information within the CONTEXT, or HISTORY, respond to the user prompt as best as you can.`;
+
+    if (isRagEnabled) {
+      // Augment the message with context.
+      const ragContext = await enhanceUserResponse(message, userEmail);
+      augmentedMessage += `
+
+CONTEXT:
+${ragContext || ''}`;
+    }
+
     message = `${augmentedMessage}
 
 PROMPT: 
@@ -206,6 +220,27 @@ ${message}
     } catch (error) {
       console.error('Error processing response: ', error);
     }
+  }
+
+  async function enhanceUserResponse(message: string, userEmail: string) {
+    const jsonMessage = [
+      {
+        text: message,
+        metadata: {
+          user_email: userEmail,
+        },
+      },
+    ];
+
+    const embeddedMessage = await embedConversation(jsonMessage, userEmail);
+
+    const vectorResponse = await queryVectorDbByNamespace(
+      embeddedMessage.embeddings,
+      userEmail,
+      topK
+    );
+
+    return vectorResponse.context;
   }
 
   async function processStream(

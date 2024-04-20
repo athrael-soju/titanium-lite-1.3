@@ -26,6 +26,21 @@ interface ChatFormValues {
     type: string;
     url: string;
   }[];
+
+  // rag
+  isRagEnabled: boolean;
+  topK: string;
+  chunkSize: string;
+  chunkBatch: string;
+  parsingStrategy: string;
+  ragFiles: {
+    id: string;
+    ragId: string;
+    name: string;
+    type: string;
+    processed: boolean;
+    chunks: string[];
+  }[];
 }
 
 export const useChatForm = () => {
@@ -36,6 +51,10 @@ export const useChatForm = () => {
       transcript: '',
       model: '',
       voice: '',
+      topK: '',
+      chunkSize: '',
+      chunkBatch: '',
+      parsingStrategy: '',
       visionId: '',
       isLoading: false,
       isAssistantEnabled: false,
@@ -43,7 +62,9 @@ export const useChatForm = () => {
       isSpeechToTextEnabled: false,
       isVisionEnabled: false,
       isVisionDefined: false,
-      visionFiles: [] 
+      isRagEnabled: false,
+      visionFiles: [],
+      ragFiles: []
     },
   });
 

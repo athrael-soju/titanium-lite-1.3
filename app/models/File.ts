@@ -5,3 +5,12 @@ interface VisionFile {
     url: string;
     createdAt: Date;
 }
+
+interface RagFile {
+    name: string;
+    path: string;
+    ragId: string;
+    purpose: string;
+    processed: boolean;
+    chunks: string[];
+  }
